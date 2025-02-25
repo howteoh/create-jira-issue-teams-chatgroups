@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.realtek.teams_chat]
+@="D:\\project\\open_issue_teams_group\\host\\com.realtek.teams_chat.json" 

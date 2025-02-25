@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teams Chat Creator</title>
+  <style>
+    body {
+      width: 800px;
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      gap: 10px;
+      background: #f5f6f7;
+      margin: 0;
+      height: 500px;
+      width: 750px;
+      font-size: 10px;
+    }
+    .issues-container {
+      flex: 1;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 12px;
+      overflow: auto;
+      height: 475px;  /* 固定高度 */
+    }
+    .select-all {
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .select-all label {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .select-all input[type="checkbox"] {
+      margin: 0 8px 0 0;
+      width: auto;
+    }
+    .select-all:hover {
+      background: #f1f3f5;
+      border-color: #dee2e6;
+    }
+    .issue-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px;
+      margin-bottom: 6px;
+      background: #fff;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    .issue-item:hover {
+      border-color: #dde1e6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .issue-checkbox {
+      flex: 0 0 20px;
+      margin: 3px 10px 0 0;
+    }
+    .issue-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .issue-title {
+      margin-bottom: 6px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .issue-title a {
+      color: #0052cc;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .issue-title a:hover {
+      text-decoration: underline;
+    }
+    .issue-assignee {
+      display: flex;
+      align-items: center;
+      font-size: 11px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .assignee-email {
+      color: #666;
+      margin-left: 6px;
+      font-size: 10px;
+      background: #f0f0f0;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .issue-comment {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed #eee;
+    }
+    .control-panel {
+      width: 250px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 16px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #333;
+      font-size: 11px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #dde1e6;
+      border-radius: 6px;
+      font-size: 11px;
+      transition: border-color 0.2s ease;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #4c6ef5;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background: #4c6ef5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background: #364fc7;
+      transform: translateY(-1px);
+    }
+    #status {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .success {
+      background: #e3fcef;
+      color: #00875a;
+      border: 1px solid #abecd6;
+    }
+    .error {
+      padding: 16px;
+      background: #ffe9e9;
+      color: #de350b;
+      border: 1px solid #ffbdad;
+      border-radius: 4px;
+      text-align: center;
+      margin: 20px;
+    }
+    .error small {
+      display: block;
+      margin: 8px 0;
+      color: #666;
+      font-size: 11px;
+    }
+    .error a {
+      display: inline-block;
+      margin: 12px 0;
+      padding: 8px 16px;
+      background: #0052cc;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 4px;
+    }
+    .error a:hover {
+      background: #0747a6;
+      text-decoration: none;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+    .settings-btn {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      left: auto;
+      padding: 6px;
+      width: auto;
+      min-width: 32px;
+      height: 32px;
+      background: white;
+      border: 1px solid #dde1e6;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    .settings-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: #666;
+    }
+    .settings-btn:hover {
+      background: #f8f9fa;
+      border-color: #ced4da;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      transform: translateY(-1px);
+    }
+    .settings-btn:hover svg {
+      fill: #333;
+    }
+    .settings-btn span:last-child {
+      display: none;
+    }
+    .settings-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 24px 35px;  /* 增加左右padding */
+      border-radius: 12px;  /* 增加圓角 */
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);  /* 增強陰影 */
+      z-index: 1000;
+      width: 300px;  /* 增加寬度 */
+      padding-bottom: 40px;  /* 為作者資訊留更多空間 */
+    }
+    .settings-modal h3 {
+      margin: 0 0 20px;
+      font-size: 15px;
+      color: #1a1a1a;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 3px;
+    }
+    .settings-modal .form-group {
+      margin-bottom: 2%;
+    }
+    .settings-modal label {
+      font-size: 12px;
+      color: #2e2e2e;
+      margin-bottom: 2px;
+    }
+    .settings-modal small {
+      display: block;
+      color: #666;
+      font-size: 10px;
+      margin-top: 3px;
+    }
+    .settings-modal input,
+    .settings-modal textarea {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 10px;
+    }
+    .settings-modal input:focus,
+    .settings-modal textarea:focus {
+      border-color: #4c6ef5;
+      box-shadow: 0 0 0 2px rgba(76,110,245,0.1);
+    }
+    .settings-modal .buttons-container {
+      display: flex;
+      gap: 2px;
+      margin-top: 10px;
+    }
+    .settings-modal button {
+      flex: 1;
+      margin: 0;
+      padding: 10px;
+      font-size: 10px;
+    }
+    .settings-modal button#saveSettings {
+      background: #4c6ef5;
+    }
+    .settings-modal button#closeSettings {
+      background: #f1f3f7;
+      color: #4a5568;
+    }
+    .settings-modal button#closeSettings:hover {
+      background: #e2e8f0;
+    }
+    .creator-info {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      font-size: 10px;
+      color: #888;
+      font-style: italic;
+    }
+    #issuesList {
+      height: calc(100% - 40px);
+      overflow-y: auto;
+    }
+    .issue-count {
+      font-size: 11px;
+      color: #666;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <button class="settings-btn" id="settingsBtn">
+    <svg viewBox="0 0 24 24">
+      <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+    </svg>
+  </button>
+  
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="settings-modal" id="settingsModal">
+    <h3>Settings</h3>
+    <div class="form-group">
+      <label for="jiraToken">JIRA API Token:</label>
+      <input type="password" id="jiraToken">
+    </div>
+    <div class="form-group">
+      <label for="jiraUsername">JIRA Username:</label>
+      <input type="text" id="jiraUsername">
+    </div>
+    <div class="form-group">
+      <label for="jiraXmlUrl">JIRA Filter XML URL:</label>
+      <input type="text" id="jiraXmlUrl">
+      <small>The URL to fetch JIRA issues in XML format</small>
+    </div>
+    <div class="form-group">
+      <label for="commentHours">Comment Hours Filter:</label>
+      <input type="number" id="commentHours" min="1" max="72" value="18">
+      <small>Show issues with comments within the last X hours</small>
+    </div>
+    <div class="form-group">
+      <label for="targetUsers">Target JIRA Users:</label>
+      <textarea id="targetUsers" rows="2" placeholder="Enter JIRA user IDs, separated by commas"></textarea>
+      <small>e.g. JIRAUSER50632, JIRAUSER51966</small>
+    </div>
+    <div class="buttons-container">
+      <button id="saveSettings">Save</button>
+      <button id="closeSettings">Cancel</button>
+    </div>
+    <div class="creator-info">Created by HowTeoh</div>
+  </div>
+  
+  <div class="issues-container">
+    <div class="select-all">
+      <label>
+        <input type="checkbox" id="selectAll">
+        Select All Issues
+      </label>
+      <span class="issue-count" id="issueCount">(0/0)</span>
+    </div>
+    <div id="issuesList">
+      <div class="loading">Loading issues from JIRA...</div>
+    </div>
+  </div>
+  <div class="control-panel">
+    <div class="form-group">
+      <label for="ownerEmail">Teams Owner Email:</label>
+      <input type="email" id="ownerEmail">
+    </div>
+    
+    <div class="form-group">
+      <label for="memberEmails">Teams Member Emails:</label>
+      <textarea id="memberEmails" rows="2" placeholder="Enter email addresses, separated by commas"></textarea>
+    </div>
+    <button id="createChat">Create Selected Chats Group</button>
+    <div id="status"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 

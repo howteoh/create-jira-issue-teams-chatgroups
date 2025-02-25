@@ -1,0 +1,9 @@
+{
+  "name": "com.realtek.teams_chat",
+  "description": "Teams Chat Creator Native Host",
+  "path": "D:\\project\\open_issue_teams_group\\host\\run_host.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://mmjjadbibnjhbldgjafilbfapgjkleem/"
+  ]
+} 
